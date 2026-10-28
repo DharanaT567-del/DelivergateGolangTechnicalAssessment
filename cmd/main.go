@@ -79,8 +79,6 @@ func run() error {
 		fmt.Printf("%-6s %s\n", route.Method, route.Path)
 	}
 
-	fmt.Println("========================================")
-
 	// Server port
 	port := os.Getenv("PORT")
 	if port == "" {

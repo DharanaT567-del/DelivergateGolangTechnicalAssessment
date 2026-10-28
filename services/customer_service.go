@@ -1,15 +1,12 @@
 package services
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"icecream-shop/models"
 	"icecream-shop/repository"
 	"icecream-shop/utils"
-
-	"gorm.io/gorm"
 )
 
 type CustomerInput struct {
@@ -68,11 +65,7 @@ func (s *CustomerService) Update(id uint, input CustomerInput) (models.Customer,
 }
 
 func (s *CustomerService) Delete(id uint) error {
-	err := s.customers.Delete(id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return err
-	}
-	if err != nil {
+	if err := s.customers.Delete(id); err != nil {
 		return fmt.Errorf("delete customer: %w", err)
 	}
 	return nil

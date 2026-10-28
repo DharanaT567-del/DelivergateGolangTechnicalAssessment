@@ -6,6 +6,8 @@ import (
 
 	"icecream-shop/repository"
 	"icecream-shop/utils"
+
+	"gorm.io/gorm"
 )
 
 var ErrUnauthorized = errors.New("invalid username or password")
@@ -21,7 +23,13 @@ func NewAuthService(users *repository.UserRepository, secret string) *AuthServic
 
 func (s *AuthService) Login(username, password string) (string, error) {
 	user, err := s.users.FindByUsername(username)
-	if err != nil || !utils.CheckPassword(user.Password, password) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", ErrUnauthorized
+	}
+	if err != nil {
+		return "", fmt.Errorf("find user: %w", err)
+	}
+	if !utils.CheckPassword(user.Password, password) {
 		return "", ErrUnauthorized
 	}
 	token, err := utils.GenerateToken(s.secret, user.ID, user.Username, user.Role)

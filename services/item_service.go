@@ -8,8 +8,6 @@ import (
 	"icecream-shop/models"
 	"icecream-shop/repository"
 	"icecream-shop/utils"
-
-	"gorm.io/gorm"
 )
 
 type ItemInput struct {
@@ -71,11 +69,7 @@ func (s *ItemService) Update(id uint, input ItemInput) (models.Item, error) {
 }
 
 func (s *ItemService) Delete(id uint) error {
-	err := s.items.Delete(id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return err
-	}
-	if err != nil {
+	if err := s.items.Delete(id); err != nil {
 		return fmt.Errorf("delete item: %w", err)
 	}
 	return nil
