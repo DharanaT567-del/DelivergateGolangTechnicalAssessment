@@ -1,0 +1,56 @@
+{
+  "info": {
+    "_postman_id": "f59eb732-64a8-47d7-ae35-1cecea5a0f01",
+    "name": "Ice Cream Shop Management API",
+    "description": "Complete API collection. Login saves the JWT to the collection variable named token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "itemId", "value": "1" },
+    { "key": "customerId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"owner\",\"password\":\"owner123\"}", "options": { "raw": { "language": "json" } } },
+            "url": "{{baseUrl}}/api/v1/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const body = pm.response.json();", "if (body.token) pm.collectionVariables.set('token', body.token);"] } }]
+        },
+        { "name": "Logout", "request": { "method": "POST", "url": "{{baseUrl}}/api/v1/auth/logout" } }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "item": [
+        { "name": "List items (search, pagination, sorting)", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/items?page=1&limit=10&search=Chocolate&sort=name" } },
+        { "name": "Get item", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/items/{{itemId}}" } },
+        { "name": "Create item", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Chocolate\",\"category\":\"Ice Cream\",\"quantity\":20,\"price\":4.5,\"description\":\"Chocolate scoop\"}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/items" } },
+        { "name": "Update item", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Chocolate\",\"category\":\"Ice Cream\",\"quantity\":18,\"price\":4.75,\"description\":\"Updated description\"}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/items/{{itemId}}" } },
+        { "name": "Delete item (Owner)", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/items/{{itemId}}" } }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        { "name": "List customers", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/customers?page=1&limit=10&search=Smith" } },
+        { "name": "Get customer", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/customers/{{customerId}}" } },
+        { "name": "Create customer", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"first_name\":\"Alex\",\"last_name\":\"Smith\",\"phone\":\"555-0100\",\"email\":\"alex@example.com\",\"address\":\"1 Main Street\"}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/customers" } },
+        { "name": "Update customer", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"first_name\":\"Alex\",\"last_name\":\"Smith\",\"phone\":\"555-0101\",\"email\":\"alex@example.com\",\"address\":\"2 Main Street\"}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/customers/{{customerId}}" } },
+        { "name": "Delete customer (Owner)", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/customers/{{customerId}}" } }
+      ]
+    }
+  ]
+}

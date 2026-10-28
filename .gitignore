@@ -1,0 +1,7 @@
+.env
+icecream.db
+icecream.db-shm
+icecream.db-wal
+bin/
+vendor/
+coverage.out

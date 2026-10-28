@@ -1,0 +1,80 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ice Cream Shop Management API",
+    "version": "1.0.0",
+    "description": "REST API for inventory and customer management with role-based access control."
+  },
+  "servers": [{ "url": "/" }],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "parameters": {
+      "id": { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "minimum": 1 } }
+    },
+    "schemas": {
+      "ItemInput": {
+        "type": "object",
+        "required": ["name", "category", "quantity", "price"],
+        "properties": {
+          "name": { "type": "string" },
+          "category": { "type": "string" },
+          "quantity": { "type": "integer", "minimum": 0 },
+          "price": { "type": "number", "exclusiveMinimum": 0 },
+          "description": { "type": "string" }
+        }
+      },
+      "CustomerInput": {
+        "type": "object",
+        "required": ["first_name", "phone"],
+        "properties": {
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "address": { "type": "string" }
+        }
+      }
+    }
+  },
+  "security": [{ "BearerAuth": [] }],
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "security": [],
+        "summary": "Authenticate a seeded user",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["username", "password"], "properties": { "username": { "type": "string" }, "password": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "JWT returned" }, "401": { "description": "Invalid credentials" } }
+      }
+    },
+    "/api/v1/auth/logout": { "post": { "summary": "Logout", "responses": { "200": { "description": "Logged out" }, "401": { "description": "Unauthorized" } } } },
+    "/api/v1/items": {
+      "get": { "summary": "List, search, paginate and sort inventory items", "parameters": [
+        { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+        { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10, "maximum": 100 } },
+        { "name": "search", "in": "query", "schema": { "type": "string" } },
+        { "name": "sort", "in": "query", "schema": { "type": "string", "example": "-name" } }
+      ], "responses": { "200": { "description": "Items returned" }, "401": { "description": "Unauthorized" } } },
+      "post": { "summary": "Create item (Owner or Manager)", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemInput" } } } }, "responses": { "201": { "description": "Item created" }, "400": { "description": "Validation error" }, "403": { "description": "Forbidden" } } }
+    },
+    "/api/v1/items/{id}": {
+      "get": { "summary": "Get item", "parameters": [{ "$ref": "#/components/parameters/id" }], "responses": { "200": { "description": "Item returned" }, "404": { "description": "Not found" } } },
+      "put": { "summary": "Update item", "parameters": [{ "$ref": "#/components/parameters/id" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemInput" } } } }, "responses": { "200": { "description": "Item updated" }, "403": { "description": "Forbidden" } } },
+      "delete": { "summary": "Soft delete item (Owner)", "parameters": [{ "$ref": "#/components/parameters/id" }], "responses": { "200": { "description": "Item deleted" }, "403": { "description": "Forbidden" } } }
+    },
+    "/api/v1/customers": {
+      "get": { "summary": "List and search customers", "parameters": [
+        { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+        { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10, "maximum": 100 } },
+        { "name": "search", "in": "query", "schema": { "type": "string" } }
+      ], "responses": { "200": { "description": "Customers returned" } } },
+      "post": { "summary": "Create customer", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CustomerInput" } } } }, "responses": { "201": { "description": "Customer created" }, "400": { "description": "Validation error" } } }
+    },
+    "/api/v1/customers/{id}": {
+      "get": { "summary": "Get customer", "parameters": [{ "$ref": "#/components/parameters/id" }], "responses": { "200": { "description": "Customer returned" }, "404": { "description": "Not found" } } },
+      "put": { "summary": "Update customer", "parameters": [{ "$ref": "#/components/parameters/id" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CustomerInput" } } } }, "responses": { "200": { "description": "Customer updated" } } },
+      "delete": { "summary": "Soft delete customer (Owner)", "parameters": [{ "$ref": "#/components/parameters/id" }], "responses": { "200": { "description": "Customer deleted" }, "403": { "description": "Forbidden" } } }
+    }
+  }
+}
