@@ -1,8 +1,0 @@
-.git
-.env
-*.db
-*.db-shm
-*.db-wal
-bin
-vendor
-coverage.out
